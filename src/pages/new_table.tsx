@@ -148,6 +148,8 @@ export default function HomePage() {
   
   useEffect(()=>{
     if(project) {
+      offset = 0
+      logsTreeOffset = []
       loadBranch()
     }
     if(branch){
