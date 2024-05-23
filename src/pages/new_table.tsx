@@ -13,9 +13,11 @@ export default function HomePage() {
   
   const projectMap = {
     deploy: {
+      url: `/swagger/deploy-swagger/`,
       branchApiUrl: `/api/v4/projects/486/repository/branches?search=&per_page=20&sort=updated_desc`
     },
     dsm: {
+      url: `/swagger/dsm-swagger/`,
       branchApiUrl: `/api/v4/projects/464/repository/branches?search=&per_page=20&sort=updated_desc`
     },
   }
@@ -84,7 +86,7 @@ export default function HomePage() {
     }
     let url = ''
     if (branch&&!urlSwagger?.includes('.')) {
-      url = `/swagger/dsm-swagger/-/refs/${branch}/logs_tree/${urlSwagger.join('/')}?format=json&offset=${offset}`
+      url = `${projectMap[project].url}-/refs/${branch}/logs_tree/${urlSwagger.join('/')}?format=json&offset=${offset}`
       fetch(url, {
         method: 'GET',
         params: {
@@ -237,7 +239,7 @@ export default function HomePage() {
           </div>
           <div className={styles.swaggerUiBottom}>
             {searchParams.get('fileSwagger')?<div className={styles.swaggerUiMain}>
-              <iframe className={styles.swaggerUiIframe} src={`?${iframeUrl}/#/swagger-ui?url=/swagger/dsm-swagger/-/raw/${iframeUrl}`}/>
+              <iframe className={styles.swaggerUiIframe} src={`?${iframeUrl}/#/swagger-ui?url=${projectMap[project].url}-/raw/${iframeUrl}`}/>
             </div>:null}
           </div>
         </div>
