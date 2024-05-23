@@ -10,14 +10,29 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 let offset = 0
 let logsTreeOffset = []
 export default function HomePage() {
+  
+  const projectMap = {
+    deploy: {
+      branchApiUrl: `/api/v4/projects/486/repository/branches?search=&per_page=20&sort=updated_desc`
+    },
+    dsm: {
+      branchApiUrl: `/api/v4/projects/464/repository/branches?search=&per_page=20&sort=updated_desc`
+    },
+  }
+  
   const [form] = Form.useForm();
   
   const [searchParams, setSearchParams] = useSearchParams();
+  const project = searchParams.get('project')
   const branch = searchParams.get('branch')
   const urlSwaggerStr = searchParams.get('urlSwagger')
   const urlSwagger = urlSwaggerStr?.split('/')||[]
   const fileSwagger = searchParams.get('fileSwagger')
   const [random, setRandom] = useState(Math.random());
+  const [projectOptions, setProjectOptions] = useState([
+    {label:`安装部署`, value: `deploy`},
+    {label:`管控面`, value: `dsm`},
+  ]);
   const [branchOptions, setBranchOptions] = useState([]);
   const [logsTree, setLogsTree] = useState([]);
   
@@ -30,6 +45,7 @@ export default function HomePage() {
       return
     }
     const _searchParams: any = {
+      project,
       branch,
     }
     if(e.includes('.')){
@@ -68,7 +84,7 @@ export default function HomePage() {
     }
     let url = ''
     if (branch&&!urlSwagger?.includes('.')) {
-      url = `/storage/dsm-swagger/-/refs/${branch}/logs_tree/${urlSwagger.join('/')}?format=json&offset=${offset}`
+      url = `/swagger/dsm-swagger/-/refs/${branch}/logs_tree/${urlSwagger.join('/')}?format=json&offset=${offset}`
       fetch(url, {
         method: 'GET',
         params: {
@@ -106,18 +122,10 @@ export default function HomePage() {
       });
     }
   }
-  
-  useEffect(()=>{
-    if(branch){
-      offset = 0
-      logsTreeOffset = []
-      loadLogsTree()  
-    }
-  }, [branch, urlSwaggerStr])
-  
-  useEffect(()=>{
+
+  const loadBranch = () => {
     setSpinning(true)
-    fetch('/api/v4/projects/464/repository/branches?search=&per_page=20&sort=updated_desc', {
+    fetch(projectMap[project].branchApiUrl, {
       method: 'GET',
       params: {
         format: 'json',
@@ -134,13 +142,25 @@ export default function HomePage() {
     })).finally(()=>{
       setSpinning(false)
     });
-  },[])
+  }
+  
+  useEffect(()=>{
+    if(project) {
+      loadBranch()
+    }
+    if(branch){
+      offset = 0
+      logsTreeOffset = []
+      loadLogsTree()  
+    }
+  }, [branch, urlSwaggerStr, project])
 
-  const changeBranch = (e: any)=>{
-    reload({branch: e})
+  const changeValues = (values: any, allValues)=>{
+    reload(allValues)
   }
   
   const reload = (params: any) => {
+    !params.branch && delete params.branch
     setSearchParams(params)
   }
   
@@ -155,10 +175,12 @@ export default function HomePage() {
 
   const fileDirClick = (urlSwagger) => {
     let _searchParams: any = {
-      branch
+      branch,
+      project,
     }
     urlSwagger&&(_searchParams = {
       branch,
+      project,
       urlSwagger,
     })
     setSearchParams(_searchParams)
@@ -181,16 +203,21 @@ export default function HomePage() {
           <div className={styles.swaggerUiTop}>
             <Space className={styles.swaggerUiLn}>
               <Form
+                onValuesChange={changeValues}
                 form={form}
                 onFinish={reload}
                 layout={'inline'}
                 name="basic"
                 initialValues={{
+                  project: searchParams.get('project'),
                   branch: searchParams.get('branch'),
                 }}
               >
+                <Form.Item label={'切换项目'} name={'project'}>
+                  <Select options={projectOptions} style={{width: '160px'}} placeholder={'请选择分支'}/>
+                </Form.Item>
                 <Form.Item label={'分支名'} name={'branch'}>
-                  <Select showSearch onChange={changeBranch} options={branchOptions} style={{width: '160px'}} placeholder={'请选择分支'}/>
+                  <Select showSearch options={branchOptions} style={{width: '160px'}} placeholder={'请选择分支'}/>
                 </Form.Item>
               </Form>
               <div>
@@ -210,7 +237,7 @@ export default function HomePage() {
           </div>
           <div className={styles.swaggerUiBottom}>
             {searchParams.get('fileSwagger')?<div className={styles.swaggerUiMain}>
-              <iframe className={styles.swaggerUiIframe} src={`?${iframeUrl}/#/swagger-ui?url=/storage/dsm-swagger/-/raw/${iframeUrl}`}/>
+              <iframe className={styles.swaggerUiIframe} src={`?${iframeUrl}/#/swagger-ui?url=/swagger/dsm-swagger/-/raw/${iframeUrl}`}/>
             </div>:null}
           </div>
         </div>

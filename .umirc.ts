@@ -92,7 +92,7 @@ export default defineConfig({
       secure: false,
       logLevel: 'debug',
     },
-    '/storage/': {
+    '/swagger/': {
       target: 'http://10.128.132.126/',
       changeOrigin: true,
       secure: false,
