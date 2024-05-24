@@ -167,7 +167,7 @@ export default function HomePage() {
 
   const changeValues = (values: any, allValues)=>{
     if(values.project) {
-      form.setFieldValue(`branch`, null)
+      form.setFieldsValue({branch: null})
       setSearchParams(values)
       setLogsTree([])
       reset()
