@@ -13,7 +13,7 @@ export default function HomePage() {
   
   const projectMap = {
     deploy: {
-      url: `/swagger/deploy-swagger/`,
+      url: `/swagger/magnascale-swagger/`,
       branchApiUrl: `/api/v4/projects/486/repository/branches?search=&per_page=20&sort=updated_desc`
     },
     dsm: {
@@ -146,21 +146,34 @@ export default function HomePage() {
     });
   }
   
+  const reset = () => {
+    offset = 0
+    logsTreeOffset = []
+  }
+  
   useEffect(()=>{
-    if(project) {
-      offset = 0
-      logsTreeOffset = []
-      loadBranch()
-    }
     if(branch){
-      offset = 0
-      logsTreeOffset = []
+      reset()
       loadLogsTree()  
     }
-  }, [branch, urlSwaggerStr, project])
+  }, [branch, urlSwaggerStr])
+
+  useEffect(()=>{
+    if(project) {
+      reset()
+      loadBranch()
+    }
+  }, [project])
 
   const changeValues = (values: any, allValues)=>{
-    reload(allValues)
+    if(values.project) {
+      form.setFieldValue(`branch`, null)
+      setSearchParams(values)
+      setLogsTree([])
+      reset()
+    } else {
+      reload(allValues)   
+    }
   }
   
   const reload = (params: any) => {
@@ -218,7 +231,7 @@ export default function HomePage() {
                 }}
               >
                 <Form.Item label={'切换项目'} name={'project'}>
-                  <Select options={projectOptions} style={{width: '160px'}} placeholder={'请选择分支'}/>
+                  <Select options={projectOptions} style={{width: '160px'}} placeholder={'请选择项目'}/>
                 </Form.Item>
                 <Form.Item label={'分支名'} name={'branch'}>
                   <Select showSearch options={branchOptions} style={{width: '160px'}} placeholder={'请选择分支'}/>

@@ -49,7 +49,7 @@ const target = 'https://mock.apifox.com/m1/1459334-0-default/'; // product BVT
 
 // const target = 'https://10.128.134.110/'; // product BVT
 export default defineConfig({
-  title: "swagger视图工具",
+  title: "swagger-view",
   history: {
     type: 'hash'
   },
