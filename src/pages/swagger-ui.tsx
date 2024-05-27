@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { history, useSearchParams } from 'umi';
 import SwaggerUI from 'swagger-ui-react';
-import styles from './swagger-ui-ln.less';
 import "./swagger-ui.css"
-import SwaggerJson from './swagger.json'
 
 export default function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,6 +19,6 @@ export default function HomePage() {
   },[])
   
   return (
-    <SwaggerUI className={styles.swaggerUiList} url={searchParams.get('url')} docExpansion={"none"} deepLinking={true}/>
+    <SwaggerUI url={searchParams.get('url')} docExpansion={"none"} deepLinking={true}/>
   );
 }
